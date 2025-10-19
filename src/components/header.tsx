@@ -58,7 +58,7 @@ const Header = () => {
                 variant="ghost" 
                 size="icon" 
                 asChild 
-                className="text-accent hover:text-accent animate-pulse"
+                className="text-accent hover:bg-accent hover:text-accent-foreground animate-pulse"
                 style={{
                     filter: 'drop-shadow(0 0 3px hsl(var(--accent)))',
                     animationDuration: '3s'
