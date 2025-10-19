@@ -8,8 +8,6 @@ const CURRENT_USER_KEY = 'cosmic-quizzer-currentUser';
 const ALL_USERS_KEY = 'cosmic-quizzer-allUsers';
 
 const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "D$j9@pL!7mZ&rW*k#G2h";
-
 
 export interface User {
   username: string;
@@ -24,6 +22,7 @@ interface UserContextType {
   allUsers: User[];
   getLeaderboard: (topic?: QuizTopic) => User[];
   login: (username: string, password?: string) => void;
+  loginAdmin: () => void;
   signup: (username: string, password?: string) => void;
   logout: () => void;
   addPoints: (points: number, topic?: QuizTopic) => void;
@@ -69,19 +68,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setAllUsers(updatedUsers);
     localStorage.setItem(ALL_USERS_KEY, JSON.stringify(updatedUsers));
   }
+  
+  const loginAdmin = useCallback(() => {
+    const adminUser: User = { username: ADMIN_USERNAME, totalScore: 0, scores: {}, isAdmin: true };
+    setCurrentUser(adminUser);
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(adminUser));
+  }, []);
 
   const login = useCallback((username: string, password?: string) => {
-    if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
-        if (password === ADMIN_PASSWORD) {
-            const adminUser: User = { username: ADMIN_USERNAME, totalScore: 0, scores: {}, isAdmin: true };
-            setCurrentUser(adminUser);
-            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(adminUser));
-            return;
-        } else {
-            throw new Error("Incorrect admin password.");
-        }
-    }
-
     const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
     if (!user) {
@@ -181,7 +175,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <UserContext.Provider value={{ currentUser, allUsers, getLeaderboard, login, signup, logout, addPoints, deleteUser, isLoading }}>
+    <UserContext.Provider value={{ currentUser, allUsers, getLeaderboard, login, loginAdmin, signup, logout, addPoints, deleteUser, isLoading }}>
       {children}
     </UserContext.Provider>
   );

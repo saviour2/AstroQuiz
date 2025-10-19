@@ -9,15 +9,29 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function AdminLoginForm() {
   const [password, setPassword] = useState("");
-  const { login } = useUser();
+  const { loginAdmin } = useUser();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim()) {
       try {
-        // Hardcode admin username for this form
-        login("admin", password.trim());
+        // Direct check here to avoid context complexities
+        const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
+        if (!adminPass) {
+          throw new Error("Admin configuration error. Please contact support.");
+        }
+        
+        if (password.trim() === adminPass) {
+          loginAdmin();
+          toast({
+            title: "Admin Login Successful",
+            description: "Welcome, Admin!",
+          });
+        } else {
+          throw new Error("Incorrect admin password.");
+        }
       } catch (error: any) {
         toast({
           variant: "destructive",
