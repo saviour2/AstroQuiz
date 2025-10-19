@@ -1,0 +1,10 @@
+{
+  "placeholderImages": [
+    {
+      "id": "deep-space-nebula",
+      "description": "A vibrant and colorful nebula in deep space, showing pillars of gas and dust with new stars forming within.",
+      "imageUrl": "https://images.unsplash.com/photo-1615195627275-48660e9cd84f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxlYWdsZSUyMG5lYnVsYXxlbnwwfHx8fDE3NjA4NjMzOTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "eagle nebula"
+    }
+  ]
+}
