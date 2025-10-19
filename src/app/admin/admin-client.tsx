@@ -88,7 +88,7 @@ export default function AdminClient() {
                                     </div>
                                     <AlertDialog>
                                       <AlertDialogTrigger asChild>
-                                        <Button variant="destructive" size="icon">
+                                        <Button variant="destructive" size="icon" title={`Delete ${user.username}`}>
                                             <Trash2 size={16} />
                                         </Button>
                                       </AlertDialogTrigger>
@@ -111,7 +111,7 @@ export default function AdminClient() {
                             ))}
                         </ul>
                     ) : (
-                        <p className="text-center text-muted-foreground py-8">No users to display.</p>
+                        <p className="text-center text-muted-foreground py-8">No registered users to display.</p>
                     )}
                 </CardContent>
             </Card>

@@ -8,7 +8,7 @@ const CURRENT_USER_KEY = 'cosmic-quizzer-currentUser';
 const ALL_USERS_KEY = 'cosmic-quizzer-allUsers';
 
 const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "D$j9@pL!7mZ&rW*k#G2h";
 
 
 export interface User {
@@ -42,18 +42,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       const storedUsers = localStorage.getItem(ALL_USERS_KEY);
       const initialUsers = storedUsers ? JSON.parse(storedUsers) : [];
-      
+      setAllUsers(initialUsers);
+
       const storedCurrentUserJSON = localStorage.getItem(CURRENT_USER_KEY);
       if (storedCurrentUserJSON) {
         const storedCurrentUser = JSON.parse(storedCurrentUserJSON);
-        if (storedCurrentUser.username.toLowerCase() === ADMIN_USERNAME.toLowerCase() && storedCurrentUser.isAdmin) {
-          setCurrentUser(storedCurrentUser);
+        if (storedCurrentUser.isAdmin && storedCurrentUser.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+          // For admin, we re-validate on load, but don't need to check against the allUsers array
+           setCurrentUser(storedCurrentUser);
         } else {
-          const user = initialUsers.find((u: User) => u.username === storedCurrentUser.username);
-          setCurrentUser(user || null);
+           const user = initialUsers.find((u: User) => u.username === storedCurrentUser.username);
+           setCurrentUser(user || null);
         }
       }
-      setAllUsers(initialUsers);
     } catch (error) {
       console.error("Failed to access localStorage:", error);
     } finally {
@@ -76,20 +77,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         } else {
             throw new Error("Incorrect admin password.");
         }
-    } else {
-        const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+    } 
 
-        if (!user) {
-            throw new Error("User not found. Please sign up.");
-        }
+    const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
-        if (user.password !== password) {
-          throw new Error("Incorrect password.");
-        }
-        
-        setCurrentUser(user);
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    if (!user) {
+        throw new Error("User not found. Please sign up.");
     }
+
+    if (user.password !== password) {
+      throw new Error("Incorrect password.");
+    }
+    
+    setCurrentUser(user);
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
   }, [allUsers]);
 
   const signup = useCallback((username: string, password?: string) => {
@@ -113,7 +114,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
     
     const newUser: User = { username, password, totalScore: 0, scores: {} };
-    updateAllUsers([...allUsers, newUser]);
+    const updatedUsers = [...allUsers, newUser];
+    updateAllUsers(updatedUsers);
     
   }, [allUsers]);
 
@@ -130,15 +132,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const updatedUsers = allUsers.map(u => {
       if (u.username === currentUser.username) {
         const newTotalScore = u.totalScore + points;
+        let topicScores = u.scores || {};
         if (topic) {
-          const newTopicScore = (u.scores?.[topic] || 0) + points;
-          return { 
-            ...u, 
-            scores: { ...(u.scores || {}), [topic]: newTopicScore },
-            totalScore: newTotalScore 
-          };
+          const newTopicScore = (topicScores[topic] || 0) + points;
+          topicScores = { ...topicScores, [topic]: newTopicScore };
         }
-        return { ...u, totalScore: newTotalScore };
+        return { 
+          ...u, 
+          scores: topicScores,
+          totalScore: newTotalScore 
+        };
       }
       return u;
     });
@@ -147,18 +150,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const updatedCurrentUser = updatedUsers.find(u => u.username === currentUser.username);
     if(updatedCurrentUser) {
       setCurrentUser(updatedCurrentUser);
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedCurrentUser));
     }
 
   }, [currentUser, allUsers]);
 
   const getLeaderboard = useCallback((topic?: QuizTopic): User[] => {
+    const usersWithScores = allUsers.filter(u => u.totalScore > 0 && !u.isAdmin);
     if (topic) {
-      return [...allUsers]
+      return [...usersWithScores]
         .filter(u => u.scores && u.scores[topic] && u.scores[topic]! > 0)
         .sort((a, b) => (b.scores?.[topic] || 0) - (a.scores?.[topic] || 0))
         .slice(0, 10);
     }
-    return [...allUsers]
+    return [...usersWithScores]
       .sort((a, b) => b.totalScore - a.totalScore)
       .slice(0, 10);
   }, [allUsers]);
