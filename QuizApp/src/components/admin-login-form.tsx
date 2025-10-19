@@ -16,8 +16,8 @@ export default function AdminLoginForm() {
     e.preventDefault();
     if (password.trim()) {
       try {
-        // Direct password check to ensure reliability.
-        if (password.trim() === "adminpass") {
+        // Securely check against the environment variable.
+        if (password.trim() === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
           loginAdmin();
           toast({
             title: "Admin Login Successful",
