@@ -1,9 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Rocket, Trophy, LogOut, Sparkles, Shield } from "lucide-react";
+import { Rocket, Trophy, LogOut, Sparkles, Shield, Orbit } from "lucide-react";
 import { useUser } from "@/context/user-context";
 import { Button } from "./ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 
 const Header = () => {
   const { currentUser, logout } = useUser();
@@ -16,7 +23,7 @@ const Header = () => {
           Cosmic Quizzer
         </h1>
       </Link>
-      <nav className="flex items-center gap-4">
+      <nav className="flex items-center gap-2">
         {currentUser && (
           <>
             {currentUser.isAdmin && (
@@ -44,6 +51,21 @@ const Header = () => {
             </Button>
           </>
         )}
+        <TooltipProvider>
+           <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-foreground">
+                <a href="https://solarxplorer.vercel.app/" target="_blank" rel="noopener noreferrer">
+                  <Orbit size={18} />
+                  <span className="sr-only">Go to SolarXplorer</span>
+                </a>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Explore SolarXplorer</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </nav>
     </header>
   );
