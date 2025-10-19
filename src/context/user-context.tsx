@@ -66,6 +66,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const logout = useCallback(() => {
     localStorage.removeItem(CURRENT_USER_KEY);
     setCurrentUser(null);
+    window.location.href = '/';
   }, []);
 
   const addPoints = useCallback((points: number, topic?: QuizTopic) => {

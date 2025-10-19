@@ -4,8 +4,9 @@ import { useUser } from "@/context/user-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Rocket, Star } from "lucide-react";
+import { Rocket, Star, ArrowLeft } from "lucide-react";
 import Image from 'next/image';
+import Link from 'next/link';
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function MissionClient() {
@@ -28,6 +29,14 @@ export default function MissionClient() {
                     <CardTitle className="font-headline">Access Denied</CardTitle>
                     <CardDescription>Please log in to access missions.</CardDescription>
                 </CardHeader>
+                <CardContent>
+                    <Button asChild>
+                        <Link href="/">
+                            <ArrowLeft className="mr-2" />
+                            Return to Login
+                        </Link>
+                    </Button>
+                </CardContent>
             </Card>
         );
     }
@@ -38,7 +47,13 @@ export default function MissionClient() {
         <div className="flex justify-center items-center">
             <Card className="w-full max-w-2xl bg-card/70 backdrop-blur-sm">
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-3xl flex items-center justify-center gap-2 text-accent" style={{textShadow: '0 0 8px hsl(var(--accent))'}}>
+                    <Button variant="ghost" asChild className="absolute top-4 left-4 text-muted-foreground hover:text-foreground">
+                        <Link href="/">
+                            <ArrowLeft className="mr-2" />
+                            Back to Quizzes
+                        </Link>
+                    </Button>
+                    <CardTitle className="font-headline text-3xl flex items-center justify-center gap-2 text-accent pt-10" style={{textShadow: '0 0 8px hsl(var(--accent))'}}>
                         <Rocket /> Special Mission
                     </CardTitle>
                     <CardDescription>Explore the Eagle Nebula</CardDescription>
