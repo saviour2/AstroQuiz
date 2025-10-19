@@ -31,6 +31,11 @@ export default function SignupForm({ onShowLogin }: SignupFormProps) {
     if (username.trim() && password.trim()) {
       try {
         signup(username.trim(), password.trim());
+        toast({
+          title: "Account Created!",
+          description: "Please log in to continue.",
+        });
+        onShowLogin();
       } catch (error: any) {
         toast({
           variant: "destructive",

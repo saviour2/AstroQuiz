@@ -33,12 +33,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     try {
-      // Clear existing users for a fresh start
-      localStorage.removeItem(ALL_USERS_KEY);
-      localStorage.removeItem(CURRENT_USER_KEY);
-      
-      setAllUsers([]);
-      setCurrentUser(null);
+      const storedUsers = localStorage.getItem(ALL_USERS_KEY);
+      if (storedUsers) {
+        setAllUsers(JSON.parse(storedUsers));
+      } else {
+        localStorage.setItem(ALL_USERS_KEY, JSON.stringify([]));
+      }
+
+      const storedCurrentUser = localStorage.getItem(CURRENT_USER_KEY);
+      if (storedCurrentUser) {
+        const users = storedUsers ? JSON.parse(storedUsers) : [];
+        const user = users.find((u: User) => u.username === storedCurrentUser);
+        setCurrentUser(user || null);
+      }
     } catch (error) {
       console.error("Failed to access localStorage:", error);
     } finally {
@@ -86,8 +93,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const newUser: User = { username, password, totalScore: 0, scores: {} };
     updateAllUsers([...allUsers, newUser]);
     
-    setCurrentUser(newUser);
-    localStorage.setItem(CURRENT_USER_KEY, newUser.username);
   }, [allUsers]);
 
 
