@@ -18,7 +18,7 @@ const AnimatedBackground = () => {
     camera.position.z = 1;
 
     // Stars
-    const starCount = 10000;
+    const starCount = 5000;
     const starVertices = [];
     for (let i = 0; i < starCount; i++) {
       const x = (Math.random() - 0.5) * 2000;
@@ -42,16 +42,16 @@ const AnimatedBackground = () => {
     const galaxyVertices = [];
     const colors = [];
     const color = new THREE.Color();
-    const purple = new THREE.Color(0x9400D3);
-    const blue = new THREE.Color(0x7DF9FF);
+    const orange = new THREE.Color(0xff6f00);
+    const yellow = new THREE.Color(0xffc300);
 
-    for (let i = 0; i < 5000; i++) {
+    for (let i = 0; i < 2000; i++) {
       const x = (Math.random() - 0.5) * 1500;
       const y = (Math.random() - 0.5) * 1500;
       const z = -Math.random() * 2000;
       galaxyVertices.push(x, y, z);
       
-      const mixedColor = Math.random() > 0.5 ? purple : blue;
+      const mixedColor = Math.random() > 0.5 ? orange : yellow;
       color.set(mixedColor);
       colors.push(color.r, color.g, color.b);
     }
