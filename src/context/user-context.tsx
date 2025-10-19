@@ -17,7 +17,7 @@ interface UserContextType {
   getLeaderboard: (topic?: QuizTopic) => User[];
   login: (username: string) => void;
   logout: () => void;
-  addPoints: (points: number, topic: QuizTopic) => void;
+  addPoints: (points: number, topic?: QuizTopic) => void;
   isLoading: boolean;
 }
 
@@ -68,18 +68,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setCurrentUser(null);
   }, []);
 
-  const addPoints = useCallback((points: number, topic: QuizTopic) => {
+  const addPoints = useCallback((points: number, topic?: QuizTopic) => {
     if (!currentUser) return;
     
     const updatedUsers = allUsers.map(u => {
       if (u.username === currentUser.username) {
-        const newTopicScore = (u.scores[topic] || 0) + points;
         const newTotalScore = u.totalScore + points;
-        return { 
-          ...u, 
-          scores: { ...u.scores, [topic]: newTopicScore },
-          totalScore: newTotalScore 
-        };
+        if (topic) {
+          const newTopicScore = ((u.scores && u.scores[topic]) || 0) + points;
+          return { 
+            ...u, 
+            scores: { ...(u.scores || {}), [topic]: newTopicScore },
+            totalScore: newTotalScore 
+          };
+        }
+        return { ...u, totalScore: newTotalScore };
       }
       return u;
     });
@@ -95,8 +98,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const getLeaderboard = useCallback((topic?: QuizTopic): User[] => {
     if (topic) {
       return [...allUsers]
-        .filter(u => u.scores[topic] && u.scores[topic]! > 0)
-        .sort((a, b) => (b.scores[topic] || 0) - (a.scores[topic] || 0))
+        .filter(u => u.scores && u.scores[topic] && u.scores[topic]! > 0)
+        .sort((a, b) => (b.scores?.[topic] || 0) - (a.scores?.[topic] || 0))
         .slice(0, 10);
     }
     return [...allUsers]
