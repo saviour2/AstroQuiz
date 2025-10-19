@@ -54,7 +54,16 @@ const Header = () => {
         <TooltipProvider>
            <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-foreground">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                asChild 
+                className="text-accent hover:text-accent animate-pulse"
+                style={{
+                    filter: 'drop-shadow(0 0 3px hsl(var(--accent)))',
+                    animationDuration: '3s'
+                }}
+              >
                 <a href="https://solarxplorer.vercel.app/" target="_blank" rel="noopener noreferrer">
                   <Orbit size={18} />
                   <span className="sr-only">Go to SolarXplorer</span>
