@@ -39,6 +39,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // This effect should only run on the client side
     try {
       const storedUsers = localStorage.getItem(ALL_USERS_KEY);
       const initialUsers = storedUsers ? JSON.parse(storedUsers) : [];
@@ -47,16 +48,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const storedCurrentUserJSON = localStorage.getItem(CURRENT_USER_KEY);
       if (storedCurrentUserJSON) {
         const storedCurrentUser = JSON.parse(storedCurrentUserJSON);
+        // Re-validate the stored user
         if (storedCurrentUser.isAdmin && storedCurrentUser.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
-          // For admin, we re-validate on load, but don't need to check against the allUsers array
+           // It's the admin, trust the stored session
            setCurrentUser(storedCurrentUser);
         } else {
+           // It's a regular user, find them in the full list to ensure they still exist
            const user = initialUsers.find((u: User) => u.username === storedCurrentUser.username);
            setCurrentUser(user || null);
         }
       }
     } catch (error) {
       console.error("Failed to access localStorage:", error);
+      // Clear potentially corrupt storage
+      localStorage.removeItem(ALL_USERS_KEY);
+      localStorage.removeItem(CURRENT_USER_KEY);
     } finally {
       setIsLoading(false);
     }
@@ -68,6 +74,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const login = useCallback((username: string, password?: string) => {
+    // Admin Login Check
     if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
         if (password === ADMIN_PASSWORD) {
             const adminUser: User = { username: ADMIN_USERNAME, totalScore: 0, scores: {}, isAdmin: true };
@@ -79,6 +86,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
     }
 
+    // Regular User Login Check
     const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
     if (!user) {
