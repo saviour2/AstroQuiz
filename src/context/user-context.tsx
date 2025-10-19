@@ -2,12 +2,14 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { QuizTopic } from '@/lib/types';
+import { isProfane } from '@/lib/profanity-filter';
 
 const CURRENT_USER_KEY = 'cosmic-quizzer-currentUser';
 const ALL_USERS_KEY = 'cosmic-quizzer-allUsers';
 
 export interface User {
   username: string;
+  password?: string; // Store password hash, not plaintext
   scores: { [topic in QuizTopic]?: number };
   totalScore: number;
 }
@@ -15,7 +17,7 @@ export interface User {
 interface UserContextType {
   currentUser: User | null;
   getLeaderboard: (topic?: QuizTopic) => User[];
-  login: (username: string) => void;
+  login: (username: string, password?: string) => void;
   logout: () => void;
   addPoints: (points: number, topic?: QuizTopic) => void;
   isLoading: boolean;
@@ -53,15 +55,31 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(ALL_USERS_KEY, JSON.stringify(updatedUsers));
   }
 
-  const login = useCallback((username: string) => {
+  const login = useCallback((username: string, password?: string) => {
+    if (isProfane(username)) {
+      throw new Error("Username contains inappropriate words. Please choose another.");
+    }
+
     let user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
-    if (!user) {
-      user = { username, totalScore: 0, scores: {} };
+
+    if (user) {
+      // User exists, check password
+      if (user.password !== password) {
+        throw new Error("Incorrect password.");
+      }
+    } else {
+      // New user, create one
+      if (!password) {
+        throw new Error("A password is required for new users.");
+      }
+      user = { username, password, totalScore: 0, scores: {} };
       updateAllUsers([...allUsers, user]);
     }
+    
     setCurrentUser(user);
     localStorage.setItem(CURRENT_USER_KEY, user.username);
   }, [allUsers]);
+
 
   const logout = useCallback(() => {
     localStorage.removeItem(CURRENT_USER_KEY);

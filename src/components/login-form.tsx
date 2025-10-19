@@ -5,15 +5,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LogIn } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const { login } = useUser();
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim()) {
-      login(username.trim());
+    if (username.trim() && password.trim()) {
+      try {
+        login(username.trim(), password.trim());
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: error.message,
+        });
+      }
     }
   };
 
@@ -22,7 +33,7 @@ export default function LoginForm() {
         <Card className="w-full max-w-md bg-card/70 backdrop-blur-sm border-primary/50 shadow-lg shadow-primary/20">
             <CardHeader className="text-center">
                 <CardTitle className="font-headline text-3xl text-primary" style={{textShadow: '0 0 8px hsl(var(--primary))'}}>Welcome, Cosmic Traveler</CardTitle>
-                <CardDescription className="text-muted-foreground pt-2">Enter your call sign to begin your journey.</CardDescription>
+                <CardDescription className="text-muted-foreground pt-2">Enter your call sign and password to begin your journey.</CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -35,7 +46,16 @@ export default function LoginForm() {
                         required
                         aria-label="Username"
                     />
-                    <Button type="submit" size="lg" className="w-full" disabled={!username.trim()}>
+                    <Input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="text-center text-lg h-12"
+                        required
+                        aria-label="Password"
+                    />
+                    <Button type="submit" size="lg" className="w-full" disabled={!username.trim() || !password.trim()}>
                         <LogIn className="mr-2"/>
                         Enter the Cosmos
                     </Button>
