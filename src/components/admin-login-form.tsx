@@ -16,7 +16,6 @@ export default function AdminLoginForm() {
     e.preventDefault();
     if (password.trim()) {
       try {
-        // Direct check here to avoid context complexities
         const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
         if (!adminPass) {
