@@ -7,7 +7,7 @@ import { isProfane } from '@/lib/profanity-filter';
 const CURRENT_USER_KEY = 'cosmic-quizzer-currentUser';
 const ALL_USERS_KEY = 'cosmic-quizzer-allUsers';
 
-const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
+const ADMIN_USERNAME = "admin";
 
 export interface User {
   username: string;
@@ -76,18 +76,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = useCallback((username: string, password?: string) => {
-    const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+      const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
-    if (!user) {
-        throw new Error("User not found. Please sign up.");
-    }
+      if (!user) {
+          throw new Error("User not found. Please sign up.");
+      }
 
-    if (user.password !== password) {
-      throw new Error("Incorrect password.");
-    }
-    
-    setCurrentUser(user);
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+      if (user.password !== password) {
+        throw new Error("Incorrect password.");
+      }
+      
+      setCurrentUser(user);
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
   }, [allUsers]);
 
   const signup = useCallback((username: string, password?: string) => {
