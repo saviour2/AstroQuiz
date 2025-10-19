@@ -3,6 +3,8 @@ import './globals.css';
 import { ClientProviders } from '@/components/client-providers';
 import AnimatedBackground from '@/components/animated-background';
 import Header from '@/components/header';
+import { Toaster } from "@/components/ui/toaster";
+
 
 export const metadata: Metadata = {
   title: 'Cosmic Quizzer',
@@ -30,6 +32,7 @@ export default function RootLayout({
             <Header />
             <main className="flex-1">{children}</main>
           </div>
+          <Toaster />
         </ClientProviders>
       </body>
     </html>

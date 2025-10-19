@@ -8,7 +8,6 @@ export function ClientProviders({ children }: { children: ReactNode }) {
   return (
     <UserProvider>
       {children}
-      <Toaster />
     </UserProvider>
   );
 }

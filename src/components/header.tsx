@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Rocket, Trophy, LogOut, Sparkles } from "lucide-react";
+import { Rocket, Trophy, LogOut, Sparkles, Shield } from "lucide-react";
 import { useUser } from "@/context/user-context";
 import { Button } from "./ui/button";
 
@@ -19,6 +19,13 @@ const Header = () => {
       <nav className="flex items-center gap-4">
         {currentUser && (
           <>
+            {currentUser.isAdmin && (
+               <Button variant="destructive" asChild>
+                <Link href="/admin">
+                    <Shield className="mr-2"/> Admin Panel
+                </Link>
+            </Button>
+            )}
             <div className="hidden sm:flex items-center gap-4 text-sm bg-card/50 px-4 py-2 rounded-lg border border-border/50">
               <span className="font-medium text-foreground">{currentUser.username}</span>
               <span className="flex items-center gap-1 font-bold text-accent" style={{textShadow: '0 0 8px hsl(var(--accent))'}}>

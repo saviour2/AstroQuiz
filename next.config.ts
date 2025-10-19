@@ -35,6 +35,10 @@ const nextConfig: NextConfig = {
       'https://6000-firebase-studio-1760862560163.cluster-sumfw3zmzzhzkx4mpvz3ogth4y.cloudworkstations.dev',
     ],
   },
+  env: {
+    ADMIN_USERNAME: process.env.ADMIN_USERNAME,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+  },
 };
 
 export default nextConfig;

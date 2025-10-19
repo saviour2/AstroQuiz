@@ -7,20 +7,27 @@ import { isProfane } from '@/lib/profanity-filter';
 const CURRENT_USER_KEY = 'cosmic-quizzer-currentUser';
 const ALL_USERS_KEY = 'cosmic-quizzer-allUsers';
 
+const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
+
 export interface User {
   username: string;
   password?: string;
   scores: { [topic in QuizTopic]?: number };
   totalScore: number;
+  isAdmin?: boolean;
 }
 
 interface UserContextType {
   currentUser: User | null;
+  allUsers: User[];
   getLeaderboard: (topic?: QuizTopic) => User[];
   login: (username: string, password?: string) => void;
   signup: (username: string, password?: string) => void;
   logout: () => void;
   addPoints: (points: number, topic?: QuizTopic) => void;
+  deleteUser: (username: string) => void;
   isLoading: boolean;
 }
 
@@ -34,17 +41,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     try {
       const storedUsers = localStorage.getItem(ALL_USERS_KEY);
-      if (storedUsers) {
-        setAllUsers(JSON.parse(storedUsers));
-      } else {
-        localStorage.setItem(ALL_USERS_KEY, JSON.stringify([]));
-      }
+      const initialUsers = storedUsers ? JSON.parse(storedUsers) : [];
+      setAllUsers(initialUsers);
 
-      const storedCurrentUser = localStorage.getItem(CURRENT_USER_KEY);
-      if (storedCurrentUser) {
-        const users = storedUsers ? JSON.parse(storedUsers) : [];
-        const user = users.find((u: User) => u.username === storedCurrentUser);
-        setCurrentUser(user || null);
+      const storedCurrentUserJSON = localStorage.getItem(CURRENT_USER_KEY);
+      if (storedCurrentUserJSON) {
+        const storedCurrentUser = JSON.parse(storedCurrentUserJSON);
+        if (storedCurrentUser.username === ADMIN_USERNAME && storedCurrentUser.isAdmin) {
+          setCurrentUser(storedCurrentUser);
+        } else {
+          const user = initialUsers.find((u: User) => u.username === storedCurrentUser.username);
+          setCurrentUser(user || null);
+        }
       }
     } catch (error) {
       console.error("Failed to access localStorage:", error);
@@ -59,6 +67,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const login = useCallback((username: string, password?: string) => {
+    if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase() && password === ADMIN_PASSWORD) {
+        const adminUser: User = { username: ADMIN_USERNAME, totalScore: 0, scores: {}, isAdmin: true };
+        setCurrentUser(adminUser);
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(adminUser));
+        return;
+    }
+
     const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
     if (!user) {
@@ -70,7 +85,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
     
     setCurrentUser(user);
-    localStorage.setItem(CURRENT_USER_KEY, user.username);
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
   }, [allUsers]);
 
   const signup = useCallback((username: string, password?: string) => {
@@ -82,6 +97,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
     if (!password || password.length < 6) {
         throw new Error("Password must be at least 6 characters long.");
+    }
+    if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+        throw new Error("This username is reserved.");
     }
 
     const existingUser = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
@@ -103,7 +121,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addPoints = useCallback((points: number, topic?: QuizTopic) => {
-    if (!currentUser) return;
+    if (!currentUser || currentUser.isAdmin) return;
     
     const updatedUsers = allUsers.map(u => {
       if (u.username === currentUser.username) {
@@ -141,9 +159,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       .slice(0, 10);
   }, [allUsers]);
 
+  const deleteUser = useCallback((username: string) => {
+    if (!currentUser?.isAdmin) {
+      throw new Error("You do not have permission to delete users.");
+    }
+    const updatedUsers = allUsers.filter(u => u.username !== username);
+    updateAllUsers(updatedUsers);
+  }, [currentUser, allUsers]);
+
 
   return (
-    <UserContext.Provider value={{ currentUser, getLeaderboard, login, signup, logout, addPoints, isLoading }}>
+    <UserContext.Provider value={{ currentUser, allUsers, getLeaderboard, login, signup, logout, addPoints, deleteUser, isLoading }}>
       {children}
     </UserContext.Provider>
   );
