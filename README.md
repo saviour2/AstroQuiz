@@ -56,11 +56,6 @@ npm install
 
 Create a `.env` file in the root of the project. This file will hold your secret credentials, like the admin password.
 
-```env
-# The password for accessing the admin panel
-NEXT_PUBLIC_ADMIN_PASSWORD="adminpass"
-```
-
 ### 4. Run the Development Server
 
 Start the Next.js development server.
