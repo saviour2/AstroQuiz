@@ -42,18 +42,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       const storedUsers = localStorage.getItem(ALL_USERS_KEY);
       const initialUsers = storedUsers ? JSON.parse(storedUsers) : [];
-      setAllUsers(initialUsers);
-
+      
       const storedCurrentUserJSON = localStorage.getItem(CURRENT_USER_KEY);
       if (storedCurrentUserJSON) {
         const storedCurrentUser = JSON.parse(storedCurrentUserJSON);
-        if (storedCurrentUser.username === ADMIN_USERNAME && storedCurrentUser.isAdmin) {
+        if (storedCurrentUser.username.toLowerCase() === ADMIN_USERNAME.toLowerCase() && storedCurrentUser.isAdmin) {
           setCurrentUser(storedCurrentUser);
         } else {
           const user = initialUsers.find((u: User) => u.username === storedCurrentUser.username);
           setCurrentUser(user || null);
         }
       }
+      setAllUsers(initialUsers);
     } catch (error) {
       console.error("Failed to access localStorage:", error);
     } finally {
