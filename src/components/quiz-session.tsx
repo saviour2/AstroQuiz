@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import type { Question } from '@/lib/types';
+import type { Question, QuizTopic } from '@/lib/types';
 import { provideMotivationalFeedback } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -14,7 +14,7 @@ import QuizResults from './quiz-results';
 import { CheckCircle, XCircle } from 'lucide-react';
 
 interface QuizSessionProps {
-  topic: string;
+  topic: QuizTopic;
   questions: Question[];
   onQuizEnd: () => void;
 }
@@ -72,7 +72,7 @@ export default function QuizSession({ topic, questions, onQuizEnd }: QuizSession
   };
 
   if (showResults) {
-    return <QuizResults score={score} totalQuestions={totalQuestions} onRestart={onQuizEnd} />;
+    return <QuizResults score={score} totalQuestions={totalQuestions} onRestart={onQuizEnd} topic={topic} />;
   }
   
   if (!currentQuestion) return null;

@@ -2,14 +2,14 @@
 import { useState } from "react";
 import QuizSetup from "./quiz-setup";
 import QuizSession from "./quiz-session";
-import type { Question } from "@/lib/types";
+import type { Question, QuizTopic } from "@/lib/types";
 
 export default function QuizWrapper() {
   const [quizState, setQuizState] = useState<'setup' | 'playing'>('setup');
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [topic, setTopic] = useState('');
+  const [topic, setTopic] = useState<QuizTopic | ''>('');
 
-  const startQuiz = (topic: string, generatedQuestions: Question[]) => {
+  const startQuiz = (topic: QuizTopic, generatedQuestions: Question[]) => {
     setTopic(topic);
     setQuestions(generatedQuestions);
     setQuizState('playing');
@@ -21,7 +21,7 @@ export default function QuizWrapper() {
     setTopic('');
   };
 
-  if (quizState === 'playing') {
+  if (quizState === 'playing' && topic) {
     return <QuizSession topic={topic} questions={questions} onQuizEnd={endQuiz} />;
   }
 

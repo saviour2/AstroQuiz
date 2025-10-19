@@ -4,18 +4,20 @@ import { useUser } from '@/context/user-context';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { PartyPopper } from 'lucide-react';
+import { QuizTopic } from '@/lib/types';
 
 interface QuizResultsProps {
   score: number;
   totalQuestions: number;
+  topic: QuizTopic;
   onRestart: () => void;
 }
 
-export default function QuizResults({ score, totalQuestions, onRestart }: QuizResultsProps) {
+export default function QuizResults({ score, totalQuestions, topic, onRestart }: QuizResultsProps) {
   const { addPoints } = useUser();
 
   useEffect(() => {
-    addPoints(score);
+    addPoints(score, topic);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -28,7 +30,7 @@ export default function QuizResults({ score, totalQuestions, onRestart }: QuizRe
             <PartyPopper size={48} className="text-primary" style={{filter: 'drop-shadow(0 0 8px hsl(var(--primary)))'}}/>
         </div>
         <CardTitle className="font-headline text-3xl pt-4">Quiz Complete!</CardTitle>
-        <CardDescription>You've navigated the cosmos of knowledge.</CardDescription>
+        <CardDescription>You've navigated the cosmos of knowledge on {topic}.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">

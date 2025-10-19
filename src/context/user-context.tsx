@@ -1,21 +1,23 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { QuizTopic } from '@/lib/types';
 
 const CURRENT_USER_KEY = 'cosmic-quizzer-currentUser';
 const ALL_USERS_KEY = 'cosmic-quizzer-allUsers';
 
 export interface User {
   username: string;
+  scores: { [topic in QuizTopic]?: number };
   totalScore: number;
 }
 
 interface UserContextType {
   currentUser: User | null;
-  leaderboard: User[];
+  getLeaderboard: (topic?: QuizTopic) => User[];
   login: (username: string) => void;
   logout: () => void;
-  addPoints: (points: number) => void;
+  addPoints: (points: number, topic: QuizTopic) => void;
   isLoading: boolean;
 }
 
@@ -47,7 +49,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   
   const updateAllUsers = (updatedUsers: User[]) => {
-    updatedUsers.sort((a, b) => b.totalScore - a.score);
     setAllUsers(updatedUsers);
     localStorage.setItem(ALL_USERS_KEY, JSON.stringify(updatedUsers));
   }
@@ -55,7 +56,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const login = useCallback((username: string) => {
     let user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
     if (!user) {
-      user = { username, totalScore: 0 };
+      user = { username, totalScore: 0, scores: {} };
       updateAllUsers([...allUsers, user]);
     }
     setCurrentUser(user);
@@ -67,14 +68,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setCurrentUser(null);
   }, []);
 
-  const addPoints = useCallback((points: number) => {
+  const addPoints = useCallback((points: number, topic: QuizTopic) => {
     if (!currentUser) return;
     
-    const updatedUsers = allUsers.map(u => 
-      u.username === currentUser.username
-        ? { ...u, totalScore: u.totalScore + points }
-        : u
-    );
+    const updatedUsers = allUsers.map(u => {
+      if (u.username === currentUser.username) {
+        const newTopicScore = (u.scores[topic] || 0) + points;
+        const newTotalScore = u.totalScore + points;
+        return { 
+          ...u, 
+          scores: { ...u.scores, [topic]: newTopicScore },
+          totalScore: newTotalScore 
+        };
+      }
+      return u;
+    });
     
     updateAllUsers(updatedUsers);
     const updatedCurrentUser = updatedUsers.find(u => u.username === currentUser.username);
@@ -84,10 +92,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   }, [currentUser, allUsers]);
 
-  const leaderboard = allUsers.sort((a, b) => b.totalScore - a.totalScore).slice(0, 10);
+  const getLeaderboard = useCallback((topic?: QuizTopic): User[] => {
+    if (topic) {
+      return [...allUsers]
+        .filter(u => u.scores[topic] && u.scores[topic]! > 0)
+        .sort((a, b) => (b.scores[topic] || 0) - (a.scores[topic] || 0))
+        .slice(0, 10);
+    }
+    return [...allUsers]
+      .sort((a, b) => b.totalScore - a.totalScore)
+      .slice(0, 10);
+  }, [allUsers]);
+
 
   return (
-    <UserContext.Provider value={{ currentUser, leaderboard, login, logout, addPoints, isLoading }}>
+    <UserContext.Provider value={{ currentUser, getLeaderboard, login, logout, addPoints, isLoading }}>
       {children}
     </UserContext.Provider>
   );

@@ -8,19 +8,20 @@ import { generateQuizQuestions } from "@/lib/actions";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
 import { Loader2, Wand2 } from "lucide-react";
-import type { Question } from "@/lib/types";
+import type { Question, QuizTopic } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { quizTopics } from "@/lib/types";
 
 const formSchema = z.object({
-  topic: z.string().min(2, {
-    message: "Topic must be at least 2 characters.",
+  topic: z.enum(quizTopics, {
+    required_error: "Please select a topic.",
   }),
 });
 
 interface QuizSetupProps {
-  onQuizStart: (topic: string, questions: Question[]) => void;
+  onQuizStart: (topic: QuizTopic, questions: Question[]) => void;
 }
 
 export default function QuizSetup({ onQuizStart }: QuizSetupProps) {
@@ -29,9 +30,6 @@ export default function QuizSetup({ onQuizStart }: QuizSetupProps) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      topic: "",
-    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -63,7 +61,7 @@ export default function QuizSetup({ onQuizStart }: QuizSetupProps) {
     <Card className="bg-card/70 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Start a New Quiz</CardTitle>
-        <CardDescription>Enter a topic and let our AI Quiz Master generate a challenge for you!</CardDescription>
+        <CardDescription>Select a topic and let our AI Quiz Master generate a challenge for you!</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -74,9 +72,18 @@ export default function QuizSetup({ onQuizStart }: QuizSetupProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Quiz Topic</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 'Solar System' or 'Black Holes'" {...field} />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a cosmic topic" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {quizTopics.map(topic => (
+                        <SelectItem key={topic} value={topic}>{topic}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
