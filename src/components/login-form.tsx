@@ -33,8 +33,7 @@ export default function LoginForm({ onShowSignup }: LoginFormProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <Card className="w-full max-w-md bg-card/70 backdrop-blur-sm border-primary/50 shadow-lg shadow-primary/20">
+      <Card className="w-full bg-card/70 backdrop-blur-sm border-primary/50 shadow-lg shadow-primary/20">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-3xl text-primary" style={{textShadow: '0 0 8px hsl(var(--primary))'}}>Welcome Back, Traveler</CardTitle>
           <CardDescription className="text-muted-foreground pt-2">Enter your call sign and password to continue your journey.</CardDescription>
@@ -70,6 +69,5 @@ export default function LoginForm({ onShowSignup }: LoginFormProps) {
             <Button variant="link" onClick={onShowSignup} className="pl-2">Sign Up</Button>
         </CardFooter>
       </Card>
-    </div>
   );
 }

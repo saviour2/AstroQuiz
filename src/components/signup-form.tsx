@@ -47,52 +47,50 @@ export default function SignupForm({ onShowLogin }: SignupFormProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-        <Card className="w-full max-w-md bg-card/70 backdrop-blur-sm border-primary/50 shadow-lg shadow-primary/20">
-            <CardHeader className="text-center">
-                <CardTitle className="font-headline text-3xl text-primary" style={{textShadow: '0 0 8px hsl(var(--primary))'}}>Join the Cosmos</CardTitle>
-                <CardDescription className="text-muted-foreground pt-2">Create your call sign to begin your journey.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <Input
-                        type="text"
-                        placeholder="Choose your call sign..."
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="text-center text-lg h-12"
-                        required
-                        aria-label="Username"
-                    />
-                    <Input
-                        type="password"
-                        placeholder="Set your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="text-center text-lg h-12"
-                        required
-                        aria-label="Password"
-                    />
-                    <Input
-                        type="password"
-                        placeholder="Confirm your password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="text-center text-lg h-12"
-                        required
-                        aria-label="Confirm Password"
-                    />
-                    <Button type="submit" size="lg" className="w-full" disabled={!username.trim() || !password.trim() || !confirmPassword.trim()}>
-                        <UserPlus className="mr-2"/>
-                        Create Account
-                    </Button>
-                </form>
-            </CardContent>
-            <CardFooter className="flex justify-center text-sm">
-                <p>Already have a call sign?</p>
-                <Button variant="link" onClick={onShowLogin} className="pl-2">Log In</Button>
-            </CardFooter>
-        </Card>
-    </div>
+      <Card className="w-full bg-card/70 backdrop-blur-sm border-primary/50 shadow-lg shadow-primary/20">
+          <CardHeader className="text-center">
+              <CardTitle className="font-headline text-3xl text-primary" style={{textShadow: '0 0 8px hsl(var(--primary))'}}>Join the Cosmos</CardTitle>
+              <CardDescription className="text-muted-foreground pt-2">Create your call sign to begin your journey.</CardDescription>
+          </CardHeader>
+          <CardContent>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  <Input
+                      type="text"
+                      placeholder="Choose your call sign..."
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="text-center text-lg h-12"
+                      required
+                      aria-label="Username"
+                  />
+                  <Input
+                      type="password"
+                      placeholder="Set your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="text-center text-lg h-12"
+                      required
+                      aria-label="Password"
+                  />
+                  <Input
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="text-center text-lg h-12"
+                      required
+                      aria-label="Confirm Password"
+                  />
+                  <Button type="submit" size="lg" className="w-full" disabled={!username.trim() || !password.trim() || !confirmPassword.trim()}>
+                      <UserPlus className="mr-2"/>
+                      Create Account
+                  </Button>
+              </form>
+          </CardContent>
+          <CardFooter className="flex justify-center text-sm">
+              <p>Already have a call sign?</p>
+              <Button variant="link" onClick={onShowLogin} className="pl-2">Log In</Button>
+          </CardFooter>
+      </Card>
   );
 }

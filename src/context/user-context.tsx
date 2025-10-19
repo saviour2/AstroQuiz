@@ -48,12 +48,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const storedCurrentUserJSON = localStorage.getItem(CURRENT_USER_KEY);
       if (storedCurrentUserJSON) {
         const storedCurrentUser = JSON.parse(storedCurrentUserJSON);
-        // Re-validate the stored user
-        if (storedCurrentUser.isAdmin && storedCurrentUser.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
-           // It's the admin, trust the stored session
+         if (storedCurrentUser.isAdmin && storedCurrentUser.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
            setCurrentUser(storedCurrentUser);
         } else {
-           // It's a regular user, find them in the full list to ensure they still exist
            const user = initialUsers.find((u: User) => u.username === storedCurrentUser.username);
            setCurrentUser(user || null);
         }
@@ -74,7 +71,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const login = useCallback((username: string, password?: string) => {
-    // Admin Login Check
     if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
         if (password === ADMIN_PASSWORD) {
             const adminUser: User = { username: ADMIN_USERNAME, totalScore: 0, scores: {}, isAdmin: true };
@@ -86,7 +82,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
     }
 
-    // Regular User Login Check
     const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
     if (!user) {
