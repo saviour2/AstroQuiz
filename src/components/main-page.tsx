@@ -1,11 +1,10 @@
 "use client";
 import { useUser } from "@/context/user-context";
 import { Skeleton } from "./ui/skeleton";
-import LoginForm from "./login-form";
+import AuthPage from "./auth-page";
 import QuizWrapper from "./quiz-wrapper";
 import Leaderboard from "./leaderboard";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { quizTopics, QuizTopic } from "@/lib/types";
+import { QuizTopic } from "@/lib/types";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
@@ -30,7 +29,7 @@ export default function MainPage() {
   }
 
   if (!currentUser) {
-    return <LoginForm />;
+    return <AuthPage />;
   }
 
   return (

@@ -9,7 +9,7 @@ const ALL_USERS_KEY = 'cosmic-quizzer-allUsers';
 
 export interface User {
   username: string;
-  password?: string; // Store password hash, not plaintext
+  password?: string;
   scores: { [topic in QuizTopic]?: number };
   totalScore: number;
 }
@@ -18,6 +18,7 @@ interface UserContextType {
   currentUser: User | null;
   getLeaderboard: (topic?: QuizTopic) => User[];
   login: (username: string, password?: string) => void;
+  signup: (username: string, password?: string) => void;
   logout: () => void;
   addPoints: (points: number, topic?: QuizTopic) => void;
   isLoading: boolean;
@@ -56,28 +57,42 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const login = useCallback((username: string, password?: string) => {
-    if (isProfane(username)) {
-      throw new Error("Username contains inappropriate words. Please choose another.");
+    const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+    if (!user) {
+        throw new Error("User not found. Please sign up.");
     }
 
-    let user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
-
-    if (user) {
-      // User exists, check password
-      if (user.password !== password) {
-        throw new Error("Incorrect password.");
-      }
-    } else {
-      // New user, create one
-      if (!password) {
-        throw new Error("A password is required for new users.");
-      }
-      user = { username, password, totalScore: 0, scores: {} };
-      updateAllUsers([...allUsers, user]);
+    if (user.password !== password) {
+      throw new Error("Incorrect password.");
     }
     
     setCurrentUser(user);
     localStorage.setItem(CURRENT_USER_KEY, user.username);
+  }, [allUsers]);
+
+  const signup = useCallback((username: string, password?: string) => {
+    if (isProfane(username)) {
+      throw new Error("Username contains inappropriate words. Please choose another.");
+    }
+    if (username.length < 3) {
+      throw new Error("Username must be at least 3 characters long.");
+    }
+    if (!password || password.length < 6) {
+        throw new Error("Password must be at least 6 characters long.");
+    }
+
+    const existingUser = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+    if (existingUser) {
+      throw new Error("Username is already taken. Please choose another.");
+    }
+    
+    const newUser: User = { username, password, totalScore: 0, scores: {} };
+    updateAllUsers([...allUsers, newUser]);
+    
+    setCurrentUser(newUser);
+    localStorage.setItem(CURRENT_USER_KEY, newUser.username);
   }, [allUsers]);
 
 
@@ -128,7 +143,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <UserContext.Provider value={{ currentUser, getLeaderboard, login, logout, addPoints, isLoading }}>
+    <UserContext.Provider value={{ currentUser, getLeaderboard, login, signup, logout, addPoints, isLoading }}>
       {children}
     </UserContext.Provider>
   );
