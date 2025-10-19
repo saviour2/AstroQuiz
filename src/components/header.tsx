@@ -16,7 +16,7 @@ const Header = () => {
   const { currentUser, logout } = useUser();
 
   return (
-    <header className="py-4 px-4 sm:px-8 flex justify-between items-center bg-background/50 backdrop-blur-sm border-b border-border/50">
+    <header className="py-4 px-4 sm:px-8 flex justify-between items-center bg-background/30 backdrop-blur-md border-b border-border/30">
       <Link href="/" className="flex items-center gap-3">
         <Rocket className="text-primary" size={32} style={{filter: 'drop-shadow(0 0 5px hsl(var(--primary)))'}}/>
         <h1 className="text-2xl font-headline font-bold text-primary-foreground" style={{textShadow: '0 0 8px hsl(var(--primary))'}}>
@@ -56,7 +56,7 @@ const Header = () => {
             <TooltipTrigger asChild>
               <Button 
                 variant="ghost" 
-                size="icon" 
+                size="lg" 
                 asChild 
                 className="text-accent hover:bg-accent hover:text-accent-foreground animate-pulse"
                 style={{
@@ -65,7 +65,7 @@ const Header = () => {
                 }}
               >
                 <a href="https://solarxplorer.vercel.app/" target="_blank" rel="noopener noreferrer">
-                  <Orbit size={18} />
+                  <Orbit size={24} />
                   <span className="sr-only">Go to SolarXplorer</span>
                 </a>
               </Button>
