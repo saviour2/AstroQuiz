@@ -77,7 +77,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         } else {
             throw new Error("Incorrect admin password.");
         }
-    } 
+    }
 
     const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
