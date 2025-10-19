@@ -67,25 +67,29 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const login = useCallback((username: string, password?: string) => {
-    if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase() && password === ADMIN_PASSWORD) {
-        const adminUser: User = { username: ADMIN_USERNAME, totalScore: 0, scores: {}, isAdmin: true };
-        setCurrentUser(adminUser);
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(adminUser));
-        return;
-    }
+    if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+        if (password === ADMIN_PASSWORD) {
+            const adminUser: User = { username: ADMIN_USERNAME, totalScore: 0, scores: {}, isAdmin: true };
+            setCurrentUser(adminUser);
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(adminUser));
+            return;
+        } else {
+            throw new Error("Incorrect admin password.");
+        }
+    } else {
+        const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
 
-    const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+        if (!user) {
+            throw new Error("User not found. Please sign up.");
+        }
 
-    if (!user) {
-        throw new Error("User not found. Please sign up.");
+        if (user.password !== password) {
+          throw new Error("Incorrect password.");
+        }
+        
+        setCurrentUser(user);
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
     }
-
-    if (user.password !== password) {
-      throw new Error("Incorrect password.");
-    }
-    
-    setCurrentUser(user);
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
   }, [allUsers]);
 
   const signup = useCallback((username: string, password?: string) => {
@@ -127,7 +131,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (u.username === currentUser.username) {
         const newTotalScore = u.totalScore + points;
         if (topic) {
-          const newTopicScore = ((u.scores && u.scores[topic]) || 0) + points;
+          const newTopicScore = (u.scores?.[topic] || 0) + points;
           return { 
             ...u, 
             scores: { ...(u.scores || {}), [topic]: newTopicScore },
